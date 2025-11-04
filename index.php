@@ -58,10 +58,19 @@ if ($_POST) {
             plugins: 'advlist autolink lists link image charmap preview anchor searchreplace wordcount visualblocks code fullscreen insertdatetime media table emoticons',
             toolbar: 'undo redo | styleselect | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table | forecolor backcolor | fullscreen code',
             images_upload_url: 'upload.php',
+            indentation: '4em',
             automatic_uploads: true,
             relative_urls: false,
             remove_script_host: false,
-            content_style: "body { font-family: Arial, sans-serif; font-size: 14pt; }"
+            content_style: "body { font-family: Arial, sans-serif; font-size: 14pt; }",
+            setup: function(editor) {
+                editor.on('keydown', function(e) {
+                    if (e.keyCode === 9) {
+                        e.preventDefault();
+                        editor.execCommand(e.shiftKey ? 'Outdent' : 'Indent');
+                    }
+                });
+            },
         });
     </script>
 
