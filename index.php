@@ -54,11 +54,12 @@ if ($_POST) {
         tinymce.init({
             selector: '#editor',
             license_key: 'gpl',
+            readonly: false,
             height: 600,
-            plugins: 'advlist autolink lists link image charmap preview anchor searchreplace wordcount visualblocks code fullscreen insertdatetime media table emoticons',
+            plugins: 'advlist autolink lists link image charmap preview anchor searchreplace wordcount visualblocks code fullscreen insertdatetime media table emoticons exportpdf',
             
             // Toolbar dengan tombol baru
-            toolbar: 'undo redo | styleselect | bold italic underline strikethrough | insertlabel | alignleft aligncenter alignright alignjustify | bullist numlist | link image table | forecolor backcolor | fullscreen code',
+            toolbar: 'undo redo | styleselect | bold italic underline strikethrough | insertlabel | alignleft aligncenter alignright alignjustify | bullist numlist | link image table | forecolor backcolor | fullscreen code | exportpdf',
 
             // TAB + Tombol Label:Value
             setup: function(editor) {

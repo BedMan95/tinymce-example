@@ -1,12 +1,15 @@
 <?php
-$jsonFile = 'documents.json';
-$documents = [];
+    $jsonFile  = 'documents.json';
+    $documents = [];
 
-if (file_exists($jsonFile)) {
-    $jsonData = file_get_contents($jsonFile);
-    $documents = json_decode($jsonData, true);
-    if (!is_array($documents)) $documents = [];
-}
+    if (file_exists($jsonFile)) {
+        $jsonData  = file_get_contents($jsonFile);
+        $documents = json_decode($jsonData, true);
+        if (! is_array($documents)) {
+            $documents = [];
+        }
+
+    }
 ?>
 
 <!DOCTYPE html>
@@ -20,8 +23,11 @@ if (file_exists($jsonFile)) {
         <ul>
         <?php foreach ($documents as $id => $doc): ?>
             <li>
+                <a href="viewer.php?id=<?php echo $id; ?>">
+                    <strong>View <?php echo htmlspecialchars($doc['title']); ?></strong>
+                </a>
                 <a href="index.php?id=<?php echo $id; ?>">
-                    <strong><?php echo htmlspecialchars($doc['title']); ?></strong>
+                    <strong>Edit <?php echo htmlspecialchars($doc['title']); ?></strong>
                 </a>
                 <small>(<?php echo $doc['created_at']; ?>)</small>
             </li>
