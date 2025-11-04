@@ -54,88 +54,44 @@
   <script src="assets/plugins/html2pdf/html2pdf.bundle.min.js"></script>
   <script>
 
-    tinymce.PluginManager.add('pagesetup', function (editor, url) {
-      // Tambahkan tombol ke toolbar
-      editor.ui.registry.addButton('pagesetup', {
-        text: 'Page Setup',
-        icon: 'document-properties',
-        onAction: function () {
-          // Buka dialog pengaturan
-          editor.windowManager.open({
-            title: 'Pengaturan Halaman',
-            body: {
-              type: 'panel',
-              items: [
-                {
-                  type: 'selectbox',
-                  name: 'size',
-                  label: 'Ukuran Kertas',
-                  items: [
-                    { text: 'A4 (210×297 mm)', value: 'A4' },
-                    { text: 'A5 (148×210 mm)', value: 'A5' },
-                    { text: 'Letter (216×279 mm)', value: 'Letter' }
-                  ]
-                },
-                { type: 'input', name: 'marginTop', label: 'Margin Atas (mm)', inputMode: 'numeric' },
-                { type: 'input', name: 'marginRight', label: 'Margin Kanan (mm)', inputMode: 'numeric' },
-                { type: 'input', name: 'marginBottom', label: 'Margin Bawah (mm)', inputMode: 'numeric' },
-                { type: 'input', name: 'marginLeft', label: 'Margin Kiri (mm)', inputMode: 'numeric' }
-              ]
-            },
-            buttons: [
-              { type: 'cancel', text: 'Batal' },
-              { type: 'submit', text: 'Terapkan', primary: true }
-            ],
-            initialData: {
-              size: editor.getBody().dataset.pageSize || 'A4',
-              marginTop: editor.getBody().dataset.marginTop || '20',
-              marginRight: editor.getBody().dataset.marginRight || '15',
-              marginBottom: editor.getBody().dataset.marginBottom || '20',
-              marginLeft: editor.getBody().dataset.marginLeft || '15'
-            },
-            onSubmit: function (api) {
-              const data = api.getData();
+    // Tambahkan tombol Save as PDF
+  editor.ui.registry.addButton('savepdf', {
+    text: 'Save as PDF',
+    icon: 'save',
+    onAction: function () {
+      const content = editor.getContent();
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = content;
 
-              // Simpan pengaturan di dataset agar bisa dipanggil lagi
-              const body = editor.getBody();
-              body.dataset.pageSize = data.size;
-              body.dataset.marginTop = data.marginTop;
-              body.dataset.marginRight = data.marginRight;
-              body.dataset.marginBottom = data.marginBottom;
-              body.dataset.marginLeft = data.marginLeft;
+      // Ambil data layout dari page setup
+      const body = editor.getBody();
+      const pageSize = body.dataset.pageSize || 'A4';
+      const marginTop = parseFloat(body.dataset.marginTop || 20);
+      const marginRight = parseFloat(body.dataset.marginRight || 15);
+      const marginBottom = parseFloat(body.dataset.marginBottom || 20);
+      const marginLeft = parseFloat(body.dataset.marginLeft || 15);
 
-              // Terapkan CSS
-              const pageStyles = `
-              body {
-                width: ${data.size === 'A4' ? '210mm' :
-                  data.size === 'A5' ? '148mm' : '216mm'};
-                min-height: ${data.size === 'A4' ? '297mm' :
-                  data.size === 'A5' ? '210mm' : '279mm'};
-                margin: 0 auto;
-                padding: ${data.marginTop}mm ${data.marginRight}mm ${data.marginBottom}mm ${data.marginLeft}mm;
-                background: white;
-                box-shadow: 0 0 5px rgba(0,0,0,0.1);
-                box-sizing: border-box;
-              }
-            `;
+      // Tentukan ukuran halaman berdasarkan pilihan
+      let jsPdfFormat = 'a4';
+      if (pageSize === 'A5') jsPdfFormat = 'a5';
+      else if (pageSize === 'Letter') jsPdfFormat = 'letter';
 
-              // Hapus style lama lalu tambahkan yang baru
-              const doc = editor.getDoc();
-              let styleTag = doc.getElementById('page-style');
-              if (!styleTag) {
-                styleTag = doc.createElement('style');
-                styleTag.id = 'page-style';
-                doc.head.appendChild(styleTag);
-              }
-              styleTag.textContent = pageStyles;
+      // Gabungkan semua margin dalam satu array [atas, kanan, bawah, kiri]
+      const margins = [marginTop, marginRight, marginBottom, marginLeft];
 
-              api.close();
-            }
-          });
+      // Konversi ke PDF sesuai setup
+      html2pdf().set({
+        margin: margins,
+        filename: `${(editor.getDoc().title || 'document')}.pdf`,
+        html2canvas: { scale: 2 },
+        jsPDF: {
+          unit: 'mm',
+          format: jsPdfFormat,
+          orientation: 'portrait'
         }
-      });
-    });
-
+      }).from(tempDiv).save();
+    }
+  });
 
     tinymce.init({
       selector: '#viewer',
