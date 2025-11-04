@@ -56,23 +56,50 @@ if ($_POST) {
             license_key: 'gpl',
             height: 600,
             plugins: 'advlist autolink lists link image charmap preview anchor searchreplace wordcount visualblocks code fullscreen insertdatetime media table emoticons',
-            toolbar: 'undo redo | styleselect | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image table | forecolor backcolor | fullscreen code',
-            images_upload_url: 'upload.php',
-            indentation: '4em',
-            automatic_uploads: true,
-            relative_urls: false,
-            remove_script_host: false,
-            content_style: "body { font-family: Arial, sans-serif; font-size: 14pt; }",
+            
+            // Toolbar dengan tombol baru
+            toolbar: 'undo redo | styleselect | bold italic underline strikethrough | insertlabel | alignleft aligncenter alignright alignjustify | bullist numlist | link image table | forecolor backcolor | fullscreen code',
+
+            // TAB + Tombol Label:Value
             setup: function(editor) {
+                // TAB = 4 spasi
                 editor.on('keydown', function(e) {
                     if (e.keyCode === 9) {
                         e.preventDefault();
-                        editor.execCommand(e.shiftKey ? 'Outdent' : 'Indent');
+                        editor.insertContent('&nbsp;&nbsp;&nbsp;&nbsp;');
+                    }
+                });
+
+                // Tombol Label:Value - PAKAI ui.registry!
+                editor.ui.registry.addButton('insertlabel', {
+                    text: 'Label:Value',
+                    tooltip: 'Sisipkan label dan nilai yang rata',
+                    onAction: function() {
+                        var label = prompt('Label:', 'Nama');
+                        if (!label) return;
+                        var value = prompt('Nilai:', '');
+                        if (value === null) return;
+
+                        var html = '<table style="border:none;width:100%;border-collapse:collapse;margin:2px 0;"><tr>' +
+                                '<td style="padding:0;border:none;white-space:nowrap;">' + 
+                                editor.dom.encode(label + ':') + 
+                                '</td>' +
+                                '<td style="padding:0;border:none;width:100%;">' +
+                                '<span style="display:inline-block;border-bottom:1px dotted #ccc;width:100%;padding-left:4px;">' +
+                                '&nbsp;' + editor.dom.encode(value) +
+                                '</span></td></tr></table>';
+                        editor.insertContent(html);
                     }
                 });
             },
+
+            images_upload_url: 'upload.php',
+            automatic_uploads: true,
+            relative_urls: false,
+            remove_script_host: false,
+            content_style: "body { font-family: Arial, sans-serif; font-size: 14pt; }"
         });
-    </script>
+        </script>
 
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
